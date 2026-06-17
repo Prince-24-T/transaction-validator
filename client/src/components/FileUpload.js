@@ -19,7 +19,7 @@ function FileUpload() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/upload",
+        "https://transaction-validator-8ywo.onrender.com/upload",
         formData,
       );
 
