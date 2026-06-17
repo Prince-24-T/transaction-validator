@@ -11,7 +11,17 @@ const processCSV = async (req, res) => {
   const results = [];
 
   fs.createReadStream(req.file.path)
-    .pipe(csv())
+    .pipe(
+      csv({
+        mapHeaders: ({ header }) =>
+          header
+            .replace(/^\uFEFF/, "")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "_")
+            .replace(/-+/g, "_"),
+      }),
+    )
     .on("data", (data) => {
       results.push(data);
     })

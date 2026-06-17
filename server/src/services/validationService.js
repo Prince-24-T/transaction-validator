@@ -9,22 +9,32 @@ const allowedPaymentModes = ["UPI", "CARD", "NETBANKING", "COD"];
 function validateRow(row) {
   const errors = [];
 
-  if (!row.order_id) errors.push("Missing Order ID");
+  const orderId = row.order_id?.trim();
+  const productId = row.product_id?.trim();
+  const paymentMode = row.payment_mode?.trim().toUpperCase();
+  const countryCode = row.country_code?.trim().toUpperCase();
+  const phone = row.phone?.trim();
+  const orderDate = row.order_date?.trim();
 
-  if (!row.product_id) errors.push("Missing Product ID");
+  if (!orderId) errors.push("Missing Order ID");
 
-  if (!allowedPaymentModes.includes(row.payment_mode))
+  if (!productId) errors.push("Missing Product ID");
+
+  if (!allowedPaymentModes.includes(paymentMode)) {
     errors.push("Invalid Payment Mode");
-  const expectedLength = phoneRules[row.country_code];
+  }
 
-  if (!phoneRules[row.country_code]) {
+  const expectedLength = phoneRules[countryCode];
+
+  if (!expectedLength) {
     errors.push("Unsupported Country Code");
-  } else if (row.phone?.length !== expectedLength) {
+  } else if (!phone || phone.length !== expectedLength) {
     errors.push("Invalid Phone Number");
   }
-  const date = new Date(row.order_date);
 
-  if (isNaN(date.getTime())) {
+  const date = new Date(orderDate);
+
+  if (!orderDate || isNaN(date.getTime())) {
     errors.push("Invalid Date");
   }
 
