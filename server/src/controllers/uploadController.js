@@ -55,10 +55,10 @@ const processCSV = async (req, res) => {
         const validation = validateRow(row);
 
         if (validation.isValid) {
-          validRecords.push(row);
+          validRecords.push(validation.normalizedRow);
         } else {
           invalidRecords.push({
-            ...row,
+            ...validation.normalizedRow,
             errors: validation.errors,
           });
         }
@@ -96,13 +96,14 @@ const processCSV = async (req, res) => {
       if (invalidRecords.length > 0) {
         fs.writeFileSync(`${processedPath}/error_records.csv`, invalidCsv);
       }
-      createChunks(validRecords, 1000);
+      const chunks = createChunks(validRecords, 1000);
 
       res.status(200).json({
         message: "Validation Complete",
         totalRows: results.length,
         validRecords: validRecords.length,
         invalidRecords: invalidRecords.length,
+        chunks,
         files: {
           validFile: "valid_records.csv",
           errorFile: "error_records.csv",
