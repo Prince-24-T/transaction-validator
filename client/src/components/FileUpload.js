@@ -88,7 +88,7 @@ function FileUpload() {
               <br />
               <div className="mt-3">
                 <a
-                  href="http://localhost:5000/download/valid"
+                  href="https://transaction-validator-8ywo.onrender.com/download/valid"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -98,7 +98,7 @@ function FileUpload() {
                 </a>
 
                 <a
-                  href="http://localhost:5000/download/error"
+                  href="https://transaction-validator-8ywo.onrender.com/download/error"
                   target="_blank"
                   rel="noreferrer"
                 >
