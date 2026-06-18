@@ -7,6 +7,7 @@ const app = express();
 
 const allowedOrigins = [
   "https://transaction-validator-vsxy.vercel.app",
+  "https://transaction-validator-psi.vercel.app",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []),
