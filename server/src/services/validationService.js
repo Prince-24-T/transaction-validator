@@ -17,6 +17,7 @@ const supportedDateFormats = [
   "MM/DD/YYYY",
   "MM/DD/YYYY HH:mm:ss",
 ];
+const supportedTimeFormats = ["HH:mm", "HH:mm:ss"];
 
 function isValidDateParts(year, month, day, hour = 0, minute = 0, second = 0) {
   const date = new Date(year, month - 1, day, hour, minute, second);
@@ -91,6 +92,25 @@ function validateDateTime(value) {
   });
 }
 
+function validateTime(value) {
+  const match = value.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+
+  if (!match) return false;
+
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const second = match[3] === undefined ? 0 : Number(match[3]);
+
+  return (
+    hour >= 0 &&
+    hour <= 23 &&
+    minute >= 0 &&
+    minute <= 59 &&
+    second >= 0 &&
+    second <= 59
+  );
+}
+
 function validateRow(row) {
   const errors = [];
 
@@ -100,6 +120,7 @@ function validateRow(row) {
   const countryCode = row.country_code?.trim().toUpperCase();
   const phone = row.phone?.replace(/\D/g, "");
   const orderDate = row.order_date?.trim();
+  const orderTime = row.order_time?.trim();
 
   if (!orderId) errors.push("Missing Order ID");
 
@@ -123,6 +144,12 @@ function validateRow(row) {
     );
   }
 
+  if (orderTime && !validateTime(orderTime)) {
+    errors.push(
+      `Invalid Time. Supported formats: ${supportedTimeFormats.join(", ")}`,
+    );
+  }
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -133,6 +160,7 @@ function validateRow(row) {
       phone,
       country_code: countryCode,
       order_date: orderDate,
+      ...(row.order_time !== undefined ? { order_time: orderTime } : {}),
     },
   };
 }
