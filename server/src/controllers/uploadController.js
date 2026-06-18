@@ -8,6 +8,12 @@ const processedPath = path.join(__dirname, "../processed");
 const createChunks = require("../services/chunkService");
 
 const processCSV = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      message: "Please upload a CSV file using the file field",
+    });
+  }
+
   const results = [];
 
   fs.createReadStream(req.file.path)
@@ -36,6 +42,12 @@ const processCSV = async (req, res) => {
       ];
 
       const uploadedColumns = Object.keys(results[0] || {});
+
+      if (uploadedColumns.length === 0) {
+        return res.status(400).json({
+          message: "CSV file is empty or has no readable header row",
+        });
+      }
 
       const missingColumns = requiredColumns.filter(
         (column) => !uploadedColumns.includes(column),

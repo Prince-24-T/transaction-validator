@@ -24,7 +24,11 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "text/csv" || file.originalname.endsWith(".csv")) {
+    if (
+      file.mimetype === "text/csv" ||
+      file.mimetype === "application/vnd.ms-excel" ||
+      file.originalname.toLowerCase().endsWith(".csv")
+    ) {
       cb(null, true);
     } else {
       cb(new Error("Only CSV files are allowed"));
@@ -32,6 +36,16 @@ const upload = multer({
   },
 });
 
-router.post("/", upload.single("file"), processCSV);
+const uploadCsv = (req, res, next) => {
+  upload.single("file")(req, res, (error) => {
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return next();
+  });
+};
+
+router.post("/", uploadCsv, processCSV);
 
 module.exports = router;

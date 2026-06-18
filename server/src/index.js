@@ -5,9 +5,22 @@ const downloadRoutes = require("./routes/downloadRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+  "https://transaction-validator-vsxy.vercel.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []),
+].map((origin) => origin.trim());
+
 app.use(
   cors({
-    origin: "https://transaction-validator-vsxy.vercel.app",
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
   }),
 );
 

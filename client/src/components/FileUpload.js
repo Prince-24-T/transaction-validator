@@ -6,6 +6,7 @@ const API_BASE_URL = "https://transaction-validator-8ywo.onrender.com";
 function FileUpload() {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
@@ -19,12 +20,24 @@ function FileUpload() {
 
     try {
       setLoading(true);
+      setErrorMessage("");
 
       const response = await axios.post(`${API_BASE_URL}/upload`, formData);
 
       setResult(response.data);
     } catch (error) {
-      console.error(error);
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Upload failed. Please try again.";
+
+      console.error("Upload failed:", {
+        message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
+      setErrorMessage(message);
 
       if (error.response) {
         if (error.response?.data?.missingColumns) {
@@ -32,8 +45,10 @@ function FileUpload() {
             `Missing Columns: ${error.response.data.missingColumns.join(", ")}`,
           );
         } else {
-          alert(error.response?.data?.message);
+          alert(message);
         }
+      } else {
+        alert(message);
       }
     } finally {
       setLoading(false);
@@ -70,6 +85,10 @@ function FileUpload() {
           </p>
 
           {loading && <p>Uploading...</p>}
+
+          {errorMessage && (
+            <div className="alert alert-danger mt-3">{errorMessage}</div>
+          )}
 
           {result && (
             <div>
